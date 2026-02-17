@@ -581,8 +581,8 @@
 
     <script>
         // --- Configuration ---
-        const SHEET_ID = "PASTE_YOUR_SHEET_ID_HERE";
-        const SCRIPT_URL = "PASTE_YOUR_SCRIPT_URL_HERE";
+        const SHEET_ID = "1JH30u9RI5xvvWgbSRFAOEpNpenqJe2U6l0Hhr-OXrgs";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwSicVgcVsZ9QjaBBWoGkZzuPshUpeKPDhTTlwwrq2wOc2i5QaHddQyrG-UAPD-hAZGQ/exec";
         const ADMIN_PASSWORD = "admin123"; // Default admin password
 
         // --- DOM Elements ---
