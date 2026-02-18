@@ -1,1036 +1,1108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PG Rent Management</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        :root {
-            --primary-bg: #0d0d1a;
-            --card-bg: #1a1a2e;
-            --accent-glow: #00ffdd;
-            --text-color: #e0e0e0;
-            --input-border: #3a3a5e;
-            --button-bg: #00ffdd;
-            --button-text: #0d0d1a;
-            --success-color: #4CAF50;
-            --error-color: #F44336;
-        }
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Leave Application</title>
+  <style>
+    :root {
+      --gold: #FFD700;
+      --gold-dim: #c9a800;
+      --gold-pale: rgba(255, 215, 0, 0.12);
+      --gold-glow: rgba(255, 215, 0, 0.35);
+      --black: #000000;
+      --surface: #0f0f0f;
+      --surface2: #181818;
+      --surface3: #222222;
+      --border: rgba(255, 215, 0, 0.25);
+      --text: #FFD700;
+      --text-dim: rgba(255, 215, 0, 0.6);
+      --text-muted: rgba(255, 215, 0, 0.35);
+      --red: #ff4444;
+      --steps: 4;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--primary-bg);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align items to the top initially */
-            min-height: 100vh;
-            overflow-x: hidden;
-            box-sizing: border-box;
-            position: relative;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
+    body {
+      font-family: "Outfit", sans-serif;
+      background: var(--black);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 16px 60px;
+      overflow-x: hidden;
+    }
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 221, 0.2);
-            position: relative;
-            z-index: 1;
-            animation: fadeIn 1s ease-out;
-        }
+    /* ── Animated background grid ── */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,215,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,215,0,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: gridDrift 30s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,215,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes gridDrift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 48px 48px; }
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 44px;
+      box-shadow:
+        0 0 0 1px rgba(255,215,0,0.06),
+        0 24px 80px rgba(0,0,0,0.8),
+        0 0 120px rgba(255,215,0,0.05);
+      animation: cardIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(32px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
 
-        h1, h2, h3 {
-            color: var(--accent-glow);
-            text-align: center;
-            text-shadow: 0 0 10px rgba(0, 255, 221, 0.7);
-            margin-bottom: 25px;
-        }
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-text {}
+    .header-eyebrow {
+      font-family: "Outfit", sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .header-title {
+      font-family: "Cinzel", serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+    }
+    .logo-slot {
+      width: 120px;
+      height: 52px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .logo-slot img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    /* ── Progress ── */
+    .progress-wrap {
+      margin-bottom: 36px;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .progress-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.3s;
+      cursor: default;
+    }
+    .progress-label.active { color: var(--gold); }
+    .progress-label.done   { color: var(--gold-dim); }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-color);
-            font-weight: bold;
-            text-shadow: 0 0 5px rgba(0, 255, 221, 0.3);
-        }
+    .progress-track {
+      height: 3px;
+      background: var(--surface3);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      border-radius: 99px;
+      transition: width 0.55s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+    .step-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .step-dot.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 0 8px var(--gold-glow);
+      width: 24px;
+      border-radius: 4px;
+    }
+    .step-dot.done {
+      background: var(--gold-dim);
+      border-color: var(--gold-dim);
+    }
 
-        input[type="text"],
-        input[type="password"],
-        input[type="number"],
-        select {
-            width: calc(100% - 20px);
-            padding: 12px;
-            background-color: #2a2a40;
-            border: 1px solid var(--input-border);
-            border-radius: 8px;
-            color: var(--text-color);
-            box-shadow: inset 0 0 8px rgba(0, 255, 221, 0.1);
-            transition: all 0.3s ease;
-        }
+    /* ── Steps ── */
+    .steps-container { position: relative; overflow: hidden; }
 
-        input[type="text"]:focus,
-        input[type="password"]:focus,
-        input[type="number"]:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(0, 255, 221, 0.5);
-        }
+    .step {
+      display: none;
+      animation: stepIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .step.active { display: block; }
+    @keyframes stepIn {
+      from { opacity:0; transform: translateX(24px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+    .step.leaving {
+      animation: stepOut 0.3s ease both;
+      position: absolute; width: 100%; top: 0;
+    }
+    @keyframes stepOut {
+      from { opacity:1; transform: translateX(0); }
+      to   { opacity:0; transform: translateX(-24px); }
+    }
 
-        button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 221, 0.5);
-        }
+    .step-heading {
+      font-family: "Cinzel", serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .step-heading::before {
+      content: attr(data-step);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--gold-pale);
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-family: "Outfit", sans-serif;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
 
-        button:hover {
-            box-shadow: 0 0 25px rgba(0, 255, 221, 0.8);
-            transform: translateY(-2px);
-            background-color: var(--accent-glow);
-            color: var(--primary-bg); /* Darker text on hover */
-        }
+    /* ── Field Groups ── */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
 
-        .message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: slideInMessage 0.5s forwards;
-        }
+    .field {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .field:last-child { margin-bottom: 0; }
 
-        @keyframes slideInMessage {
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Floating label */
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      transition: color 0.2s;
+    }
+    .field:focus-within label { color: var(--gold); }
 
-        .message.success {
-            background-color: rgba(76, 175, 80, 0.2);
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
+    .required-star { color: var(--red); margin-left: 2px; }
 
-        .message.error {
-            background-color: rgba(244, 67, 54, 0.2);
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-        }
+    /* ── Inputs ── */
+    input, select, textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-family: "Outfit", sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gold);
+      outline: none;
+      transition:
+        border-color 0.25s,
+        box-shadow 0.25s,
+        background 0.25s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      background: rgba(255,215,0,0.05);
+      box-shadow: 0 0 0 3px rgba(255,215,0,0.12), inset 0 1px 0 rgba(255,215,0,0.1);
+    }
+    input.has-value, select.has-value, textarea.has-value {
+      border-color: rgba(255,215,0,0.45);
+    }
+    input.field-error, select.field-error, textarea.field-error {
+      border-color: var(--red) !important;
+      box-shadow: 0 0 0 3px rgba(255,68,68,0.12) !important;
+    }
 
-        /* Rent Statement Card */
-        .rent-statement-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 221, 0.2);
-            padding: 30px;
-            margin-top: 30px;
-            animation: fadeIn 1s ease-out;
-            border: 1px solid rgba(0, 255, 221, 0.4);
-        }
+    /* Custom select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "▾";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .select-wrap:focus-within::after { color: var(--gold); }
+    .select-wrap select { padding-right: 36px; cursor: pointer; }
+    select option { background: #1a1a1a; color: var(--gold); }
 
-        .rent-statement-card h2 {
-            margin-top: 0;
-            text-align: left;
-            border-bottom: 2px solid rgba(0, 255, 221, 0.5);
-            padding-bottom: 10px;
-        }
+    textarea { resize: vertical; min-height: 90px; }
 
-        .statement-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dashed #3a3a5e;
-        }
+    /* Date inputs */
+    input[type="date"] { color-scheme: dark; cursor: pointer; }
+    input[type="number"] { cursor: text; }
+    input[type="file"] {
+      cursor: pointer;
+      padding: 10px 14px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
+    input[type="file"]::file-selector-button {
+      background: var(--gold-pale);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--gold);
+      font-family: "Outfit", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: background 0.2s;
+    }
+    input[type="file"]::file-selector-button:hover {
+      background: rgba(255,215,0,0.2);
+    }
 
-        .statement-detail:last-of-type {
-            border-bottom: none;
-        }
+    /* Datalist input */
+    input[list] { cursor: text; }
 
-        .statement-detail span:first-child {
-            font-weight: bold;
-            color: var(--text-color);
-        }
+    /* Error message */
+    .err {
+      font-size: 0.72rem;
+      color: var(--red);
+      margin-top: 5px;
+      display: none;
+      padding-left: 2px;
+      animation: errIn 0.2s ease;
+    }
+    @keyframes errIn {
+      from { opacity:0; transform: translateY(-4px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .err.show { display: block; }
 
-        .statement-detail span:last-child {
-            color: var(--accent-glow);
-            text-shadow: 0 0 5px rgba(0, 255, 221, 0.3);
-        }
+    /* File hint */
+    .file-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
 
-        .total-due {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid rgba(0, 255, 221, 0.5);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--accent-glow);
-        }
+    /* ── Segment (radio-like toggle) ── */
+    .segment-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .segment-option { display: none; }
+    .segment-label {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface2);
+      user-select: none;
+    }
+    .segment-label:hover {
+      border-color: rgba(255,215,0,0.4);
+      color: var(--gold);
+      background: var(--gold-pale);
+    }
+    .segment-option:checked + .segment-label {
+      background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,215,0,0.08));
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 12px rgba(255,215,0,0.15), inset 0 1px 0 rgba(255,215,0,0.2);
+    }
 
-        .payment-status-badge {
-            display: inline-block;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-left: 15px;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
+    /* ── Navigation Buttons ── */
+    .nav-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      font-family: "Outfit", sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      transition: opacity 0.15s;
+      border-radius: inherit;
+    }
+    .btn:active::after { opacity: 0.08; }
 
-        .payment-status-badge.paid {
-            background-color: #4CAF50; /* Green */
-            color: #fff;
-        }
-        .payment-status-badge.pending {
-            background-color: #FFC107; /* Orange */
-            color: #333;
-        }
-        .payment-status-badge.overdue {
-            background-color: #F44336; /* Red */
-            color: #fff;
-        }
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      flex: 0 0 auto;
+      padding: 14px 22px;
+    }
+    .btn-back:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-pale);
+    }
 
-        /* Admin Dashboard */
-        .admin-dashboard {
-            display: grid;
-            gap: 30px;
-            margin-top: 30px;
-        }
+    .btn-next {
+      background: linear-gradient(135deg, #FFD700, #c9a800);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+    }
+    .btn-next:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(255,215,0,0.4);
+    }
+    .btn-next:active { transform: translateY(0); }
+    .btn-next:disabled {
+      background: var(--surface3);
+      color: var(--text-muted);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #FFD700, #c9a800);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+    }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(255,215,0,0.45);
+    }
+    .btn-submit:disabled {
+      background: var(--surface3);
+      color: var(--text-muted);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
 
-        .admin-section {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 221, 0.2);
-            padding: 30px;
-            border: 1px solid rgba(0, 255, 221, 0.4);
-        }
+    /* Spinner inside button */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        .admin-section h2 {
-            text-align: left;
-            border-bottom: 2px solid rgba(0, 255, 221, 0.5);
-            padding-bottom: 10px;
-            margin-top: 0;
-            font-size: 1.8em;
-        }
+    /* ── Review Panel ── */
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 520px) { .review-grid { grid-template-columns: 1fr; } }
+    .review-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .review-item-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .review-item-value {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--gold);
+      word-break: break-word;
+    }
 
-        .admin-section label {
-            margin-top: 15px;
-        }
+    /* ── Success overlay ── */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-overlay.show { display: flex; }
+    .success-box {
+      background: var(--surface);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      padding: 48px 44px;
+      text-align: center;
+      max-width: 380px;
+      width: 90%;
+      box-shadow: 0 0 80px rgba(255,215,0,0.2);
+      animation: popIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes popIn {
+      from { opacity:0; transform: scale(0.85); }
+      to   { opacity:1; transform: scale(1); }
+    }
+    .success-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--gold-pale);
+      border: 2px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 20px;
+      animation: iconPop 0.6s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes iconPop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+    .success-title {
+      font-family: "Cinzel", serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .success-sub {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .btn-done {
+      background: linear-gradient(135deg, #FFD700, #c9a800);
+      color: #000;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-family: "Outfit", sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-done:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,215,0,0.35); }
 
-        .admin-section button {
-            margin-top: 25px;
-        }
-
-        /* Table styles */
-        .table-container {
-            margin-top: 30px;
-            overflow-x: auto;
-            max-height: 500px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 255, 221, 0.4);
-            box-shadow: 0 0 20px rgba(0, 255, 221, 0.1);
-        }
-
-        .tenant-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px; /* Ensure table doesn't get too small */
-        }
-
-        .tenant-table th, .tenant-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #3a3a5e;
-        }
-
-        .tenant-table th {
-            background-color: rgba(0, 255, 221, 0.1);
-            color: var(--accent-glow);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        .tenant-table tr:hover {
-            background-color: #2a2a40;
-            box-shadow: inset 0 0 10px rgba(0, 255, 221, 0.1);
-        }
-
-        .search-filter {
-            margin-bottom: 20px;
-        }
-
-        .search-filter input {
-            width: calc(100% - 20px);
-            padding: 12px;
-            background-color: #2a2a40;
-            border: 1px solid var(--input-border);
-            border-radius: 8px;
-            color: var(--text-color);
-            box-shadow: inset 0 0 8px rgba(0, 255, 221, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .search-filter input:focus {
-            outline: none;
-            border-color: var(--accent-glow);
-            box-shadow: 0 0 15px rgba(0, 255, 221, 0.5);
-        }
-
-        /* Utility classes */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 4px solid rgba(0, 255, 221, 0.3);
-            border-top: 4px solid var(--accent-glow);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-            display: none; /* Hidden by default */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .spinner.active {
-            display: block;
-        }
-
-        /* Media Queries for Responsiveness */
-        @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                margin: 20px auto;
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .admin-dashboard {
-                grid-template-columns: 1fr;
-            }
-
-            .statement-detail span {
-                font-size: 0.9em;
-            }
-
-            .payment-status-badge {
-                padding: 6px 10px;
-                font-size: 0.8em;
-            }
-
-            .total-due {
-                font-size: 1.1em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5em;
-            }
-            .statement-detail {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .statement-detail span:last-child {
-                margin-top: 5px;
-            }
-            .total-due {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .payment-status-badge {
-                margin-left: 0;
-                margin-top: 10px;
-            }
-        }
-
-        /* PDF styling for dark theme */
-        .pdf-content {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: none !important; /* Remove shadows for PDF */
-        }
-        .pdf-content h2, .pdf-content h3 {
-            color: var(--accent-glow) !important;
-            text-shadow: none !important;
-            border-color: rgba(0, 255, 221, 0.5) !important;
-        }
-        .pdf-content .statement-detail {
-            border-color: #3a3a5e !important;
-        }
-        .pdf-content .total-due {
-            border-color: rgba(0, 255, 221, 0.5) !important;
-            color: var(--accent-glow) !important;
-        }
-        .pdf-content .payment-status-badge.paid {
-            background-color: #4CAF50 !important;
-            color: #fff !important;
-        }
-        .pdf-content .payment-status-badge.pending {
-            background-color: #FFC107 !important;
-            color: #333 !important;
-        }
-        .pdf-content .payment-status-badge.overdue {
-            background-color: #F44336 !important;
-            color: #fff !important;
-        }
-        /* Ensure all text is visible on dark PDF */
-        .pdf-content span, .pdf-content p, .pdf-content div {
-            color: var(--text-color) !important;
-        }
-
-    </style>
+    /* ── Toast (error) ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e0000;
+      border: 1px solid var(--red);
+      color: #ff8888;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      max-width: 340px;
+      text-align: center;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 200;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
 </head>
 <body>
-    <canvas id="neonCanvas"></canvas>
-    <div class="container" id="app">
-        <h1 id="mainTitle">PG Rent Management</h1>
 
-        <!-- Tenant Login / Rent Statement View -->
-        <div id="tenantView">
-            <div id="tenantLoginForm" class="active">
-                <h2>Tenant Login</h2>
-                <form id="mobileLoginForm">
-                    <div class="form-group">
-                        <label for="tenantMobile">Enter Registered Mobile Number:</label>
-                        <input type="number" id="tenantMobile" required placeholder="e.g., 9876543210">
-                    </div>
-                    <button type="submit">View Rent Statement</button>
-                </form>
-                <div id="loginMessage" class="message hidden"></div>
-                <div class="spinner" id="tenantSpinner"></div>
-            </div>
+  <!-- Success Overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Application Submitted</div>
+      <p class="success-sub">Your leave application has been recorded successfully. Your manager will be notified.</p>
+      <button class="btn-done" id="doneBtn">Close</button>
+    </div>
+  </div>
 
-            <div id="rentStatementDisplay" class="hidden">
-                <div class="rent-statement-card" id="rentStatementCardContent">
-                    <h2>Rent Statement</h2>
-                    <div class="statement-detail"><span id="propNameLabel">Property Name:</span> <span id="propertyName"></span></div>
-                    <div class="statement-detail"><span id="tenantNameLabel">Tenant Name:</span> <span id="tenantName"></span></div>
-                    <div class="statement-detail"><span id="roomNumLabel">Room Number:</span> <span id="roomNumber"></span></div>
-                    <div class="statement-detail"><span id="monthlyRentLabel">Monthly Rent:</span> <span id="monthlyRent"></span></div>
-                    <div class="statement-detail"><span id="elecChargeLabel">Electricity Charges:</span> <span id="electricityCharges"></span></div>
-                    <div class="statement-detail"><span id="securityDepLabel">Security Deposit:</span> <span id="securityDeposit"></span></div>
-                    <div class="statement-detail"><span id="dueDateLabel">Due Date:</span> <span id="dueDate"></span></div>
-                    <div class="total-due">
-                        <span>Total Due: <span id="totalDue"></span></span>
-                        <span id="paymentStatusBadge" class="payment-status-badge"></span>
-                    </div>
-                </div>
-                <button id="downloadPdfBtn" style="margin-top: 30px;">Download Rent Statement as PDF</button>
-                <button id="backToTenantLogin" style="margin-top: 15px; background-color: #3a3a5e; box-shadow: none;">Back to Login</button>
-            </div>
-        </div>
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
-        <!-- Admin View -->
-        <div id="adminView" class="hidden">
-            <div id="adminLoginForm">
-                <h2>Owner Login</h2>
-                <form id="ownerLoginForm">
-                    <div class="form-group">
-                        <label for="adminPassword">Password:</label>
-                        <input type="password" id="adminPassword" required placeholder="Enter Owner Password">
-                    </div>
-                    <button type="submit">Login</button>
-                </form>
-                <div id="ownerLoginMessage" class="message hidden"></div>
-            </div>
-
-            <div id="adminDashboard" class="hidden">
-                <h2>Owner Dashboard</h2>
-                <div class="admin-dashboard">
-                    <div class="admin-section">
-                        <h2>Add New Tenant</h2>
-                        <form id="addTenantForm">
-                            <div class="form-group">
-                                <label for="newMobileNumber">Mobile Number:</label>
-                                <input type="number" id="newMobileNumber" required placeholder="Tenant Mobile Number">
-                            </div>
-                            <div class="form-group">
-                                <label for="newTenantName">Tenant Name:</label>
-                                <input type="text" id="newTenantName" required placeholder="Tenant Full Name">
-                            </div>
-                            <div class="form-group">
-                                <label for="newPropertyName">Property Name:</label>
-                                <input type="text" id="newPropertyName" required placeholder="PG Name / Property Name">
-                            </div>
-                            <div class="form-group">
-                                <label for="newRoomNumber">Room Number:</label>
-                                <input type="text" id="newRoomNumber" required placeholder="Room number (e.g., A101)">
-                            </div>
-                            <div class="form-group">
-                                <label for="newMonthlyRent">Monthly Rent:</label>
-                                <input type="number" id="newMonthlyRent" required placeholder="Monthly Rent Amount">
-                            </div>
-                            <div class="form-group">
-                                <label for="newElectricityCharges">Electricity Charges:</label>
-                                <input type="number" id="newElectricityCharges" value="0" placeholder="Electricity charges (optional)">
-                            </div>
-                            <div class="form-group">
-                                <label for="newSecurityDeposit">Security Deposit:</label>
-                                <input type="number" id="newSecurityDeposit" value="0" placeholder="Security Deposit Amount">
-                            </div>
-                            <div class="form-group">
-                                <label for="newTotalDue">Total Due:</label>
-                                <input type="number" id="newTotalDue" required placeholder="Total Amount Due">
-                            </div>
-                            <div class="form-group">
-                                <label for="newPaymentStatus">Payment Status:</label>
-                                <select id="newPaymentStatus" required>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Paid">Paid</option>
-                                    <option value="Overdue">Overdue</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="newDueDate">Due Date:</label>
-                                <input type="date" id="newDueDate" required>
-                            </div>
-                            <button type="submit">Add Tenant</button>
-                        </form>
-                        <div id="addTenantMessage" class="message hidden"></div>
-                        <div class="spinner" id="addTenantSpinner"></div>
-                    </div>
-
-                    <div class="admin-section">
-                        <h2>View All Tenants</h2>
-                        <div class="search-filter">
-                            <input type="text" id="tenantSearch" placeholder="Search by Mobile Number or Tenant Name...">
-                        </div>
-                        <div class="spinner" id="viewTenantsSpinner"></div>
-                        <div class="table-container">
-                            <table class="tenant-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mobile No.</th>
-                                        <th>Tenant Name</th>
-                                        <th>Property</th>
-                                        <th>Room</th>
-                                        <th>Rent</th>
-                                        <th>Electricity</th>
-                                        <th>Deposit</th>
-                                        <th>Total Due</th>
-                                        <th>Status</th>
-                                        <th>Due Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tenantTableBody">
-                                    <!-- Tenant data will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="viewTenantsMessage" class="message hidden"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="card">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-text">
+        <div class="header-eyebrow">HR Portal</div>
+        <div class="header-title">Leave Application</div>
+      </div>
+      <div class="logo-slot">
+        <!--
+          Replace src below with your logo's direct Drive link:
+          https://drive.google.com/uc?id=YOUR_FILE_ID
+        -->
+        <img src="YOUR_DIRECT_IMAGE_URL_HERE" alt="Company Logo"
+             onerror="this.parentElement.innerHTML='<span style=\'font-family:Cinzel;font-size:0.7rem;color:var(--gold);padding:8px;text-align:center;\'>COMPANY<br>LOGO</span>'">
+      </div>
     </div>
 
-    <script>
-        // --- Configuration ---
-        const SHEET_ID = "1JH30u9RI5xvvWgbSRFAOEpNpenqJe2U6l0Hhr-OXrgs";
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwSicVgcVsZ9QjaBBWoGkZzuPshUpeKPDhTTlwwrq2wOc2i5QaHddQyrG-UAPD-hAZGQ/exec";
-        const ADMIN_PASSWORD = "admin123"; // Default admin password
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span class="progress-label active" id="lbl-1">Leave Type</span>
+        <span class="progress-label" id="lbl-2">Employee</span>
+        <span class="progress-label" id="lbl-3">Schedule</span>
+        <span class="progress-label" id="lbl-4">Review</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:25%"></div>
+      </div>
+      <div class="step-dots">
+        <div class="step-dot active" data-step="1"></div>
+        <div class="step-dot" data-step="2"></div>
+        <div class="step-dot" data-step="3"></div>
+        <div class="step-dot" data-step="4"></div>
+      </div>
+    </div>
 
-        // --- DOM Elements ---
-        const app = document.getElementById('app');
-        const tenantView = document.getElementById('tenantView');
-        const tenantLoginForm = document.getElementById('tenantLoginForm');
-        const mobileLoginForm = document.getElementById('mobileLoginForm');
-        const tenantMobileInput = document.getElementById('tenantMobile');
-        const loginMessage = document.getElementById('loginMessage');
-        const tenantSpinner = document.getElementById('tenantSpinner');
+    <!-- Steps Container -->
+    <div class="steps-container" id="stepsContainer">
 
-        const rentStatementDisplay = document.getElementById('rentStatementDisplay');
-        const rentStatementCardContent = document.getElementById('rentStatementCardContent');
-        const propertyName = document.getElementById('propertyName');
-        const tenantName = document.getElementById('tenantName');
-        const roomNumber = document.getElementById('roomNumber');
-        const monthlyRent = document.getElementById('monthlyRent');
-        const electricityCharges = document.getElementById('electricityCharges');
-        const securityDeposit = document.getElementById('securityDeposit');
-        const totalDue = document.getElementById('totalDue');
-        const paymentStatusBadge = document.getElementById('paymentStatusBadge');
-        const dueDate = document.getElementById('dueDate');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        const backToTenantLogin = document.getElementById('backToTenantLogin');
+      <!-- ── STEP 1: Leave Type & Category ── -->
+      <div class="step active" id="step1">
+        <div class="step-heading" data-step="1">Leave Classification</div>
 
+        <div class="field">
+          <label>Leave Type <span class="required-star">*</span></label>
+          <div class="segment-group" id="leaveTypeGroup">
+            <input type="radio" name="leaveType" id="lt1" value="Half Day" class="segment-option">
+            <label for="lt1" class="segment-label">Half Day<br><small style="font-weight:400;font-size:0.7em;opacity:0.8">(4 Hrs)</small></label>
 
-        const adminView = document.getElementById('adminView');
-        const adminLoginForm = document.getElementById('adminLoginForm');
-        const ownerLoginForm = document.getElementById('ownerLoginForm');
-        const adminPasswordInput = document.getElementById('adminPassword');
-        const ownerLoginMessage = document.getElementById('ownerLoginMessage');
+            <input type="radio" name="leaveType" id="lt2" value="Short Leave" class="segment-option">
+            <label for="lt2" class="segment-label">Short Leave<br><small style="font-weight:400;font-size:0.7em;opacity:0.8">(&gt;1 to &lt;5 days)</small></label>
 
-        const adminDashboard = document.getElementById('adminDashboard');
-        const addTenantForm = document.getElementById('addTenantForm');
-        const addTenantMessage = document.getElementById('addTenantMessage');
-        const addTenantSpinner = document.getElementById('addTenantSpinner');
-        const tenantSearchInput = document.getElementById('tenantSearch');
-        const tenantTableBody = document.getElementById('tenantTableBody');
-        const viewTenantsSpinner = document.getElementById('viewTenantsSpinner');
-        const viewTenantsMessage = document.getElementById('viewTenantsMessage');
+            <input type="radio" name="leaveType" id="lt3" value="Mid Leave" class="segment-option">
+            <label for="lt3" class="segment-label">Mid Leave<br><small style="font-weight:400;font-size:0.7em;opacity:0.8">(&gt;5 to &lt;15 days)</small></label>
 
+            <input type="radio" name="leaveType" id="lt4" value="Long Leave" class="segment-option">
+            <label for="lt4" class="segment-label">Long Leave<br><small style="font-weight:400;font-size:0.7em;opacity:0.8">(&gt;15 to &lt;30 days)</small></label>
+          </div>
+          <div class="err" id="err-leaveType">Please select a leave type.</div>
+        </div>
 
-        // --- Helper Functions ---
-        function showMessage(element, message, type) {
-            element.textContent = message;
-            element.className = `message ${type}`;
-            element.classList.remove('hidden');
-            setTimeout(() => {
-                element.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
-        }
+        <div class="field" style="margin-top:24px;">
+          <label>Leave Category <span class="required-star">*</span></label>
+          <div class="segment-group" id="leaveCategoryGroup">
+            <input type="radio" name="leave" id="lc1" value="Privilege" class="segment-option">
+            <label for="lc1" class="segment-label">Privilege</label>
 
-        function showSpinner(spinnerElement) {
-            spinnerElement.classList.add('active');
-        }
+            <input type="radio" name="leave" id="lc2" value="Casual" class="segment-option">
+            <label for="lc2" class="segment-label">Casual</label>
 
-        function hideSpinner(spinnerElement) {
-            spinnerElement.classList.remove('active');
-        }
+            <input type="radio" name="leave" id="lc3" value="Sick" class="segment-option">
+            <label for="lc3" class="segment-label">Sick</label>
+          </div>
+          <div class="err" id="err-leave">Please select a leave category.</div>
+        </div>
 
-        function getQueryParams() {
-            const params = {};
-            window.location.search.substring(1).split('&').forEach(param => {
-                const parts = param.split('=');
-                if (parts.length === 2) {
-                    params[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
-                }
-            });
-            return params;
-        }
+        <div class="nav-row">
+          <button class="btn btn-next" id="next1">Continue →</button>
+        </div>
+      </div>
 
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            try {
-                const date = new Date(dateString);
-                // Adjust for timezone differences if dateString is just 'YYYY-MM-DD'
-                const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-                const correctedDate = new Date(date.getTime() + userTimezoneOffset);
-                return correctedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            } catch (e) {
-                console.error("Error formatting date:", e);
-                return dateString; // Return original if parsing fails
-            }
-        }
+      <!-- ── STEP 2: Employee Details ── -->
+      <div class="step" id="step2">
+        <div class="step-heading" data-step="2">Employee Details</div>
 
-        // --- Google Sheets Gviz API (Read) ---
-        async function fetchTenantData(mobileNumber = null) {
-            showSpinner(tenantSpinner);
-            hideMessage(loginMessage);
+        <div class="field">
+          <label>Full Name <span class="required-star">*</span></label>
+          <input list="employees" id="employeeName" maxlength="100"
+                 placeholder="Start typing your name…" autocomplete="off">
+          <datalist id="employees"></datalist>
+          <div class="err" id="err-employeeName">Please enter your name.</div>
+        </div>
 
-            let url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-            if (mobileNumber) {
-                // Assuming MobileNumber is in column A (index 0)
-                url += `&tq=${encodeURIComponent(`SELECT * WHERE A = '${mobileNumber}'`)}`;
-            }
+        <div class="field">
+          <label>Department <span class="required-star">*</span></label>
+          <div class="select-wrap">
+            <select id="department">
+              <option value="">— Select Department —</option>
+              <option value="HR">HR</option>
+              <option value="Admin">Admin</option>
+              <option value="Accounts">Accounts</option>
+              <option value="IT">IT</option>
+              <option value="EXIM">EXIM</option>
+              <option value="Sales">Sales</option>
+              <option value="Purchase">Purchase</option>
+              <option value="Ground Staff">Ground Staff</option>
+              <option value="Quality">Quality</option>
+            </select>
+          </div>
+          <div class="err" id="err-department">Please select your department.</div>
+        </div>
 
-            try {
-                const response = await fetch(url);
-                const text = await response.text();
-                // Google's gviz JSON is a bit funky, need to parse it
-                const jsonp = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                const data = JSON.parse(jsonp);
+        <div class="nav-row">
+          <button class="btn btn-back" id="back2">← Back</button>
+          <button class="btn btn-next" id="next2">Continue →</button>
+        </div>
+      </div>
 
-                const columns = data.table.cols.map(col => col.label);
-                const rows = data.table.rows.map(row => {
-                    const rowData = {};
-                    row.c.forEach((cell, i) => {
-                        rowData[columns[i]] = cell ? (cell.f || cell.v) : ''; // Use formatted value 'f' if available, else 'v'
-                    });
-                    return rowData;
-                });
-                return rows;
-            } catch (error) {
-                console.error('Error fetching data from Google Sheets:', error);
-                showMessage(loginMessage, 'Failed to fetch data. Please try again.', 'error');
-                return [];
-            } finally {
-                hideSpinner(tenantSpinner);
-            }
-        }
+      <!-- ── STEP 3: Schedule, Reason & Document ── -->
+      <div class="step" id="step3">
+        <div class="step-heading" data-step="3">Leave Schedule</div>
 
-        // --- Tenant View Logic ---
-        mobileLoginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const mobileNumber = tenantMobileInput.value.trim();
-            if (!mobileNumber) {
-                showMessage(loginMessage, 'Please enter a mobile number.', 'error');
-                return;
-            }
+        <div class="field-row">
+          <div class="field">
+            <label>Leave Date <span class="required-star">*</span></label>
+            <input type="date" id="leaveDate">
+            <div class="err" id="err-leaveDate">Please select a date.</div>
+          </div>
+          <div class="field">
+            <label>Rejoining Date <span class="required-star">*</span></label>
+            <input type="date" id="rejoiningDate">
+            <div class="err" id="err-rejoiningDate">Must be ≥ leave date.</div>
+          </div>
+        </div>
 
-            const tenants = await fetchTenantData(mobileNumber);
+        <div class="field">
+          <label>Leave Days <span class="required-star">*</span> <small style="text-transform:none;font-weight:400;font-size:0.85em">(0.5 = half day)</small></label>
+          <input type="number" id="leaveDays" min="0.5" max="365" step="0.5" value="0.5" placeholder="0.5">
+          <div class="err" id="err-leaveDays">Enter a valid number (0.5 – 365).</div>
+        </div>
 
-            if (tenants.length > 0) {
-                const tenant = tenants[0]; // Assuming mobile number is unique
-                propertyName.textContent = tenant.PropertyName || 'N/A';
-                tenantName.textContent = tenant.TenantName || 'N/A';
-                roomNumber.textContent = tenant.RoomNumber || 'N/A';
-                monthlyRent.textContent = `₹ ${tenant.MonthlyRent || '0'}`;
-                electricityCharges.textContent = `₹ ${tenant.ElectricityCharges || '0'}`;
-                securityDeposit.textContent = `₹ ${tenant.SecurityDeposit || '0'}`;
-                totalDue.textContent = `₹ ${tenant.TotalDue || '0'}`;
-                dueDate.textContent = formatDate(tenant.DueDate);
+        <div class="field">
+          <label>Reason <span class="required-star">*</span></label>
+          <textarea id="reason" maxlength="500" placeholder="Briefly describe the reason for your leave…"></textarea>
+          <div class="err" id="err-reason">Please provide a reason.</div>
+        </div>
 
-                const status = tenant.PaymentStatus || 'N/A';
-                paymentStatusBadge.textContent = status;
-                paymentStatusBadge.className = 'payment-status-badge';
-                if (status === 'Paid') {
-                    paymentStatusBadge.classList.add('paid');
-                } else if (status === 'Pending') {
-                    paymentStatusBadge.classList.add('pending');
-                } else if (status === 'Overdue') {
-                    paymentStatusBadge.classList.add('overdue');
-                }
+        <div class="field">
+          <label>Supporting Document <small style="text-transform:none;font-weight:400;opacity:0.7">(optional)</small></label>
+          <input type="file" id="leaveDocument" accept=".pdf,.jpg,.jpeg,.png">
+          <div class="file-hint">PDF, JPG, or PNG — max 5 MB</div>
+          <div class="err" id="err-leaveDocument">Invalid file. Use PDF, JPG, or PNG under 5 MB.</div>
+        </div>
 
-                tenantLoginForm.classList.add('hidden');
-                rentStatementDisplay.classList.remove('hidden');
-            } else {
-                showMessage(loginMessage, 'No tenant found with this mobile number.', 'error');
-                tenantLoginForm.classList.remove('hidden');
-                rentStatementDisplay.classList.add('hidden');
-            }
-        });
+        <div class="nav-row">
+          <button class="btn btn-back" id="back3">← Back</button>
+          <button class="btn btn-next" id="next3">Review →</button>
+        </div>
+      </div>
 
-        downloadPdfBtn.addEventListener('click', async () => {
-            downloadPdfBtn.disabled = true;
-            downloadPdfBtn.textContent = 'Generating PDF...';
+      <!-- ── STEP 4: Review & Submit ── -->
+      <div class="step" id="step4">
+        <div class="step-heading" data-step="4">Review & Submit</div>
 
-            const originalBg = document.body.style.backgroundColor;
-            document.body.style.backgroundColor = 'var(--primary-bg)'; // Ensure dark background for PDF capture
+        <div class="review-grid" id="reviewGrid">
+          <!-- Populated dynamically -->
+        </div>
 
-            // Create a temporary div to clone and style the content for PDF
-            const tempPdfContainer = document.createElement('div');
-            tempPdfContainer.className = 'pdf-content'; // Apply PDF specific styles
-            tempPdfContainer.innerHTML = rentStatementCardContent.innerHTML;
-            tempPdfContainer.style.width = rentStatementCardContent.offsetWidth + 'px'; // Maintain width
-            tempPdfContainer.style.position = 'absolute';
-            tempPdfContainer.style.left = '-9999px'; // Hide off-screen
-            document.body.appendChild(tempPdfContainer);
+        <div class="nav-row">
+          <button class="btn btn-back" id="back4">← Edit</button>
+          <button class="btn btn-submit" id="submitBtn">Submit Application</button>
+        </div>
+      </div>
 
-            try {
-                const canvas = await html2canvas(tempPdfContainer, {
-                    scale: 2, // Increase scale for better resolution
-                    useCORS: true,
-                    backgroundColor: null, // Transparent background for capture
-                });
-                const imgData = canvas.toDataURL('image/png');
+    </div><!-- /steps-container -->
+  </div><!-- /card -->
 
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'px',
-                    format: [canvas.width, canvas.height] // Use canvas dimensions for format
-                });
+  <script>
+    // ─────────────────────────────────────────
+    //  Constants & Helpers
+    // ─────────────────────────────────────────
+    const ALLOWED_MIME = new Set(["application/pdf","image/jpeg","image/png"]);
+    const MAX_BYTES    = 5 * 1024 * 1024;
 
-                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-                pdf.save("Rent_Statement.pdf");
+    function sanitize(v, max = 500) {
+      if (typeof v !== "string") return "";
+      return v.trim().substring(0, max).replace(/^[=+\-@]/, "'");
+    }
+    function val(id) { return document.getElementById(id)?.value || ""; }
+    function showErr(id, msg) {
+      const el = document.getElementById("err-" + id);
+      if (!el) return;
+      if (msg) { el.textContent = msg; el.classList.add("show"); }
+      else       el.classList.remove("show");
+    }
+    function clearErr(id) { showErr(id, null); }
+    function markField(id, bad) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle("field-error", bad);
+    }
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 3500);
+    }
 
-            } catch (error) {
-                console.error("Error generating PDF:", error);
-                alert("Failed to generate PDF. Please try again.");
-            } finally {
-                document.body.style.backgroundColor = originalBg; // Restore original background
-                document.body.removeChild(tempPdfContainer); // Remove temporary container
-                downloadPdfBtn.disabled = false;
-                downloadPdfBtn.textContent = 'Download Rent Statement as PDF';
-            }
-        });
+    // ─────────────────────────────────────────
+    //  Step machine
+    // ─────────────────────────────────────────
+    let currentStep = 1;
+    const TOTAL = 4;
 
+    function gotoStep(n) {
+      const prev = document.getElementById("step" + currentStep);
+      prev.classList.remove("active");
+      prev.classList.add("leaving");
+      setTimeout(() => prev.classList.remove("leaving"), 350);
 
-        backToTenantLogin.addEventListener('click', () => {
-            rentStatementDisplay.classList.add('hidden');
-            tenantLoginForm.classList.remove('hidden');
-            tenantMobileInput.value = '';
-        });
+      currentStep = n;
+      const next = document.getElementById("step" + n);
+      next.classList.add("active");
+      updateProgress();
 
-        function hideMessage(element) {
-            element.classList.add('hidden');
-        }
+      if (n === 4) buildReview();
+    }
 
-        // --- Admin View Logic ---
-        ownerLoginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const password = adminPasswordInput.value;
-            if (password === ADMIN_PASSWORD) {
-                adminLoginForm.classList.add('hidden');
-                adminDashboard.classList.remove('hidden');
-                loadAllTenants(); // Load tenants when admin logs in
-            } else {
-                showMessage(ownerLoginMessage, 'Incorrect password.', 'error');
-            }
-        });
+    function updateProgress() {
+      const pct = (currentStep / TOTAL) * 100;
+      document.getElementById("progressFill").style.width = pct + "%";
 
-        // Add Tenant Form Submission
-        addTenantForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            showSpinner(addTenantSpinner);
-            hideMessage(addTenantMessage);
+      document.querySelectorAll(".progress-label").forEach((el, i) => {
+        const s = i + 1;
+        el.classList.toggle("active", s === currentStep);
+        el.classList.toggle("done", s < currentStep);
+      });
+      document.querySelectorAll(".step-dot").forEach((el, i) => {
+        const s = i + 1;
+        el.classList.toggle("active", s === currentStep);
+        el.classList.toggle("done", s < currentStep);
+      });
+    }
 
-            const formData = {
-                MobileNumber: document.getElementById('newMobileNumber').value,
-                TenantName: document.getElementById('newTenantName').value,
-                PropertyName: document.getElementById('newPropertyName').value,
-                RoomNumber: document.getElementById('newRoomNumber').value,
-                MonthlyRent: document.getElementById('newMonthlyRent').value,
-                ElectricityCharges: document.getElementById('newElectricityCharges').value,
-                SecurityDeposit: document.getElementById('newSecurityDeposit').value,
-                TotalDue: document.getElementById('newTotalDue').value,
-                PaymentStatus: document.getElementById('newPaymentStatus').value,
-                DueDate: document.getElementById('newDueDate').value,
-            };
+    // ─────────────────────────────────────────
+    //  Validation per step
+    // ─────────────────────────────────────────
+    function validateStep1() {
+      let ok = true;
+      const lt = document.querySelector('input[name="leaveType"]:checked');
+      if (!lt) { showErr("leaveType", "Please select a leave type."); ok = false; }
+      else clearErr("leaveType");
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Required for Google Apps Script Web App
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams(formData).toString(),
-                });
+      const lc = document.querySelector('input[name="leave"]:checked');
+      if (!lc) { showErr("leave", "Please select a leave category."); ok = false; }
+      else clearErr("leave");
+      return ok;
+    }
 
-                // Since mode is 'no-cors', response.ok will always be false,
-                // and response.json() will fail. We rely on the Apps Script
-                // to handle the data and we assume success for the frontend.
-                // A real-world app might use a more complex callback or a different proxy.
+    function validateStep2() {
+      let ok = true;
+      const name = sanitize(val("employeeName"), 100);
+      if (!name) {
+        showErr("employeeName","Please enter your name."); markField("employeeName",true); ok=false;
+      } else { clearErr("employeeName"); markField("employeeName",false); }
 
-                showMessage(addTenantMessage, 'Tenant added successfully!', 'success');
-                addTenantForm.reset(); // Clear form
-                loadAllTenants(); // Reload tenant table
-            } catch (error) {
-                console.error('Error adding tenant:', error);
-                showMessage(addTenantMessage, 'Failed to add tenant. Please check your script URL and Sheet ID.', 'error');
-            } finally {
-                hideSpinner(addTenantSpinner);
-            }
-        });
+      const dept = val("department");
+      if (!dept) {
+        showErr("department","Please select your department."); markField("department",true); ok=false;
+      } else { clearErr("department"); markField("department",false); }
+      return ok;
+    }
 
-        // Load All Tenants for Admin
-        async function loadAllTenants() {
-            showSpinner(viewTenantsSpinner);
-            hideMessage(viewTenantsMessage);
-            tenantTableBody.innerHTML = ''; // Clear existing table
+    function validateStep3() {
+      let ok = true;
+      const ld = val("leaveDate");
+      if (!ld) {
+        showErr("leaveDate","Please select a leave date."); markField("leaveDate",true); ok=false;
+      } else { clearErr("leaveDate"); markField("leaveDate",false); }
 
-            const tenants = await fetchTenantData(); // Fetch all tenants (no mobile filter)
+      const rj = val("rejoiningDate");
+      if (!rj || (ld && rj < ld)) {
+        showErr("rejoiningDate","Must be on or after leave date."); markField("rejoiningDate",true); ok=false;
+      } else { clearErr("rejoiningDate"); markField("rejoiningDate",false); }
 
-            if (tenants.length > 0) {
-                tenants.forEach(tenant => {
-                    const row = tenantTableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${tenant.MobileNumber || 'N/A'}</td>
-                        <td>${tenant.TenantName || 'N/A'}</td>
-                        <td>${tenant.PropertyName || 'N/A'}</td>
-                        <td>${tenant.RoomNumber || 'N/A'}</td>
-                        <td>₹ ${tenant.MonthlyRent || '0'}</td>
-                        <td>₹ ${tenant.ElectricityCharges || '0'}</td>
-                        <td>₹ ${tenant.SecurityDeposit || '0'}</td>
-                        <td>₹ ${tenant.TotalDue || '0'}</td>
-                        <td><span class="payment-status-badge ${tenant.PaymentStatus ? tenant.PaymentStatus.toLowerCase() : 'N/A'}">${tenant.PaymentStatus || 'N/A'}</span></td>
-                        <td>${formatDate(tenant.DueDate)}</td>
-                    `;
-                });
-            } else {
-                showMessage(viewTenantsMessage, 'No tenants found in the sheet.', 'info');
-            }
-            hideSpinner(viewTenantsSpinner);
-        }
+      const days = parseFloat(val("leaveDays"));
+      if (isNaN(days) || days < 0.5 || days > 365) {
+        showErr("leaveDays","Enter a valid number (0.5 – 365)."); markField("leaveDays",true); ok=false;
+      } else { clearErr("leaveDays"); markField("leaveDays",false); }
 
-        // Search Filter for Admin View
-        tenantSearchInput.addEventListener('keyup', () => {
-            const filter = tenantSearchInput.value.toLowerCase();
-            const rows = tenantTableBody.querySelectorAll('tr');
+      const rsn = sanitize(val("reason"));
+      if (!rsn) {
+        showErr("reason","Please provide a reason."); markField("reason",true); ok=false;
+      } else { clearErr("reason"); markField("reason",false); }
 
-            rows.forEach(row => {
-                const mobileNumber = row.cells[0].textContent.toLowerCase();
-                const tenantName = row.cells[1].textContent.toLowerCase();
-                if (mobileNumber.includes(filter) || tenantName.includes(filter)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
+      const file = document.getElementById("leaveDocument").files[0];
+      if (file) {
+        if (!ALLOWED_MIME.has(file.type) || file.size > MAX_BYTES) {
+          showErr("leaveDocument","Invalid file. Use PDF, JPG, or PNG under 5 MB.");
+          markField("leaveDocument",true); ok=false;
+        } else { clearErr("leaveDocument"); markField("leaveDocument",false); }
+      }
+      return ok;
+    }
 
+    // ─────────────────────────────────────────
+    //  Review panel
+    // ─────────────────────────────────────────
+    function buildReview() {
+      const lt   = document.querySelector('input[name="leaveType"]:checked')?.value || "—";
+      const lc   = document.querySelector('input[name="leave"]:checked')?.value || "—";
+      const name = sanitize(val("employeeName"), 100) || "—";
+      const dept = val("department") || "—";
+      const ld   = val("leaveDate") || "—";
+      const rj   = val("rejoiningDate") || "—";
+      const days = val("leaveDays") || "—";
+      const rsn  = sanitize(val("reason")) || "—";
+      const file = document.getElementById("leaveDocument").files[0];
+      const doc  = file ? file.name : "None";
 
-        // --- Canvas Particle Animation ---
-        const canvas = document.getElementById('neonCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        const particleCount = 100;
-        const maxRadius = 3;
-        const minRadius = 1;
-        const color = 'rgba(0, 255, 221, 0.7)'; // Accent glow color
+      const items = [
+        ["Leave Type",   lt],
+        ["Category",     lc],
+        ["Employee",     name],
+        ["Department",   dept],
+        ["Leave Date",   ld],
+        ["Rejoining",    rj],
+        ["Days",         days],
+        ["Document",     doc],
+        ["Reason",       rsn],
+      ];
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+      const grid = document.getElementById("reviewGrid");
+      grid.innerHTML = items.map(([label, value]) => `
+        <div class="review-item">
+          <div class="review-item-label">${label}</div>
+          <div class="review-item-value">${sanitize(String(value))}</div>
+        </div>
+      `).join("");
+    }
 
-        class Particle {
-            constructor(x, y, radius, dx, dy) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.dx = dx;
-                this.dy = dy;
-                this.opacity = Math.random() * 0.5 + 0.3; // Random opacity
-            }
+    // ─────────────────────────────────────────
+    //  Navigation wiring
+    // ─────────────────────────────────────────
+    document.getElementById("next1").addEventListener("click", () => {
+      if (validateStep1()) gotoStep(2);
+    });
+    document.getElementById("back2").addEventListener("click", () => gotoStep(1));
+    document.getElementById("next2").addEventListener("click", () => {
+      if (validateStep2()) gotoStep(3);
+    });
+    document.getElementById("back3").addEventListener("click", () => gotoStep(2));
+    document.getElementById("next3").addEventListener("click", () => {
+      if (validateStep3()) gotoStep(4);
+    });
+    document.getElementById("back4").addEventListener("click", () => gotoStep(3));
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = color;
-                ctx.fillStyle = `rgba(0, 255, 221, ${this.opacity})`;
-                ctx.fill();
-            }
+    // ─────────────────────────────────────────
+    //  Submit  ← all google.script.run preserved
+    // ─────────────────────────────────────────
+    document.getElementById("submitBtn").addEventListener("click", function () {
+      const btn = this;
+      const file = document.getElementById("leaveDocument").files[0] || null;
 
-            update() {
-                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
-                    this.dx = -this.dx;
-                }
-                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
-                    this.dy = -this.dy;
-                }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Submitting…';
 
-                this.x += this.dx;
-                this.y += this.dy;
-
-                this.draw();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < particleCount; i++) {
-                let radius = Math.random() * (maxRadius - minRadius) + minRadius;
-                let x = Math.random() * (canvas.width - radius * 2) + radius;
-                let y = Math.random() * (canvas.height - radius * 2) + radius;
-                let dx = (Math.random() - 0.5) * 0.8; // Slower movement
-                let dy = (Math.random() - 0.5) * 0.8;
-                particles.push(new Particle(x, y, radius, dx, dy));
-            }
-        }
-
-        function animateParticles() {
-            requestAnimationFrame(animateParticles);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-            }
-        }
-
-        let mouse = {
-            x: undefined,
-            y: undefined
+      function buildAndSubmit(fileContent) {
+        const form = {
+          leaveType:     sanitize(document.querySelector('input[name="leaveType"]:checked')?.value || ""),
+          leave:         sanitize(document.querySelector('input[name="leave"]:checked')?.value || ""),
+          employeeName:  sanitize(val("employeeName"), 100),
+          department:    sanitize(val("department")),
+          leaveDate:     sanitize(val("leaveDate")),
+          leaveDays:     sanitize(val("leaveDays")),
+          reason:        sanitize(val("reason")),
+          rejoiningDate: sanitize(val("rejoiningDate")),
+          leaveDocument: file ? {
+            bytes:    fileContent,
+            mimeType: file.type,
+            filename: file.name.replace(/[^a-zA-Z0-9_\-\.]/g, "_").substring(0, 100)
+          } : null
         };
 
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x;
-            mouse.y = event.y;
-        });
+        google.script.run
+          .withSuccessHandler(function () {
+            btn.disabled = false;
+            btn.textContent = "Submit Application";
+            document.getElementById("successOverlay").classList.add("show");
+          })
+          .withFailureHandler(function (err) {
+            btn.disabled = false;
+            btn.textContent = "Submit Application";
+            showToast("Submission failed: " + (err?.message || "Unknown error. Please try again."));
+          })
+          .submitForm(form);
+      }
 
-        // Add a subtle reactive effect to particles based on mouse position
-        function animateParticlesWithMouse() {
-            requestAnimationFrame(animateParticlesWithMouse);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const base64 = reader.result?.split(",")[1];
+          if (!base64) {
+            showToast("Failed to read file. Please try again.");
+            btn.disabled = false;
+            btn.textContent = "Submit Application";
+            return;
+          }
+          buildAndSubmit(base64);
+        };
+        reader.onerror = function () {
+          showToast("File read error. Try a different file.");
+          btn.disabled = false;
+          btn.textContent = "Submit Application";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        buildAndSubmit(null);
+      }
+    });
 
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
+    // ─────────────────────────────────────────
+    //  Done button — reset form
+    // ─────────────────────────────────────────
+    document.getElementById("doneBtn").addEventListener("click", function () {
+      document.getElementById("successOverlay").classList.remove("show");
+      // Reset all fields
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      ["employeeName","department","leaveDate","rejoiningDate","leaveDays","reason"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = id === "leaveDays" ? "0.5" : "";
+      });
+      document.getElementById("leaveDocument").value = "";
+      gotoStep(1);
+    });
 
-                // Simple repulsion effect
-                const distance = Math.sqrt(Math.pow(mouse.x - p.x, 2) + Math.pow(mouse.y - p.y, 2));
-                if (distance < 100 && mouse.x !== undefined) {
-                    const angle = Math.atan2(p.y - mouse.y, p.x - mouse.x);
-                    const force = 100 / (distance + 1); // Inverse distance force
-                    p.dx += Math.cos(angle) * 0.1 * force;
-                    p.dy += Math.sin(angle) * 0.1 * force;
-                }
+    // ─────────────────────────────────────────
+    //  Live has-value class for styling
+    // ─────────────────────────────────────────
+    ["employeeName","department","leaveDate","rejoiningDate","leaveDays","reason"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const check = () => el.classList.toggle("has-value", !!el.value.trim());
+      el.addEventListener("input", check);
+      el.addEventListener("change", check);
+      check();
+    });
 
-                p.update();
-            }
-        }
+    // ─────────────────────────────────────────
+    //  Load employee names ← google.script.run preserved
+    // ─────────────────────────────────────────
+    function loadEmployeeData() {
+      google.script.run
+        .withSuccessHandler(function (names) {
+          const datalist = document.getElementById("employees");
+          datalist.innerHTML = "";
+          names.forEach(function (name) {
+            if (typeof name !== "string") return;
+            const safe = name.trim().substring(0, 100);
+            if (!safe) return;
+            const opt = document.createElement("option"); // Safe DOM creation
+            opt.value = safe;
+            datalist.appendChild(opt);
+          });
+        })
+        .withFailureHandler(function () {
+          console.warn("Could not load employee list.");
+        })
+        .getEmployeeNames();
+    }
 
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles(); // Reinitialize particles on resize
-        });
-
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const queryParams = getQueryParams();
-
-            if (queryParams.admin !== undefined) {
-                tenantView.classList.add('hidden');
-                adminView.classList.remove('hidden');
-                mainTitle.textContent = "PG Rent Management - Owner Panel";
-            } else {
-                adminView.classList.add('hidden');
-                tenantView.classList.remove('hidden');
-                mainTitle.textContent = "PG Rent Management - Tenant Panel";
-            }
-
-            // Initialize canvas animation
-            resizeCanvas();
-            initParticles();
-            animateParticlesWithMouse(); // Use the mouse-reactive animation
-        });
-    </script>
+    document.addEventListener("DOMContentLoaded", loadEmployeeData);
+  </script>
 </body>
 </html>
