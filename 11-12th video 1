@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Physics Career Roadmap</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #0f172a;
+  color: white;
+  overflow: hidden;
+}
+
+.slide {
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  padding: 60px;
+  box-sizing: border-box;
+}
+
+.active {
+  display: block;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 32px;
+  margin-bottom: 15px;
+  color: #38bdf8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.nav {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  background: #38bdf8;
+  color: black;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Slide 1 -->
+<div class="slide active">
+  <h1>From Classroom to Career</h1>
+  <h2>Physics Roadmap (Class 11–12)</h2>
+  <img src="https://via.placeholder.com/800x400">
+</div>
+
+<!-- Slide 2 -->
+<div class="slide">
+  <h1>The Reality</h1>
+  <div class="grid">
+    <div class="card">
+      <h2>Problem</h2>
+      <p>Students study Physics for exams, not for careers.</p>
+      <p>Massive skill gap exists in India.</p>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/400x300">
+    </div>
+  </div>
+</div>
+
+<!-- Slide 3 -->
+<div class="slide">
+  <h1>Class 11 Physics</h1>
+  <div class="grid">
+    <div class="card">
+      <h2>Mechanics Core</h2>
+      <ul>
+        <li>Units & Measurements</li>
+        <li>Kinematics</li>
+        <li>Laws of Motion</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Energy & Systems</h2>
+      <ul>
+        <li>Work, Energy, Power</li>
+        <li>Rotational Motion</li>
+        <li>Gravitation</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4 -->
+<div class="slide">
+  <h1>Advanced Concepts</h1>
+  <div class="grid">
+    <div class="card">
+      <h2>Thermal Physics</h2>
+      <ul>
+        <li>Thermodynamics</li>
+        <li>Kinetic Theory</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Waves</h2>
+      <ul>
+        <li>Oscillations</li>
+        <li>Wave Motion</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5 -->
+<div class="slide">
+  <h1>Class 12 Physics</h1>
+  <div class="grid">
+    <div class="card">
+      <h2>Electricity & Magnetism</h2>
+      <ul>
+        <li>Electrostatics</li>
+        <li>Current Electricity</li>
+        <li>Magnetism</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Modern Physics</h2>
+      <ul>
+        <li>Dual Nature</li>
+        <li>Atoms & Nuclei</li>
+        <li>Semiconductors</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6 -->
+<div class="slide">
+  <h1>Practical Skills</h1>
+  <div class="grid">
+    <div class="card">
+      <h2>Experiments</h2>
+      <p>Vernier Calipers, Pendulum, Friction, Circuits</p>
+    </div>
+    <div class="card">
+      <h2>Real Skills</h2>
+      <p>Problem solving, observation, data analysis</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7 -->
+<div class="slide">
+  <h1>The Problem</h1>
+  <p>Even after all this… students don’t know where Physics leads.</p>
+</div>
+
+<!-- Slide 8 -->
+<div class="slide">
+  <h1>The Shift You Need</h1>
+  <ul>
+    <li>Study for careers, not exams</li>
+    <li>Map every chapter → real-world application</li>
+    <li>Build skills alongside concepts</li>
+  </ul>
+</div>
+
+<!-- Slide 9 -->
+<div class="slide">
+  <h1>What I Will Teach You</h1>
+  <ul>
+    <li>Physics → Career Mapping</li>
+    <li>Conceptual clarity</li>
+    <li>Real-world applications</li>
+  </ul>
+</div>
+
+<!-- Slide 10 -->
+<div class="slide">
+  <h1>Welcome to the Journey 🚀</h1>
+</div>
+
+<div class="nav">
+  <button onclick="prev()">Prev</button>
+  <button onclick="next()">Next</button>
+</div>
+
+<script>
+let slides = document.querySelectorAll(".slide");
+let index = 0;
+
+function showSlide(i){
+  slides.forEach(s => s.classList.remove("active"));
+  slides[i].classList.add("active");
+}
+
+function next(){
+  if(index < slides.length - 1){
+    index++;
+    showSlide(index);
+  }
+}
+
+function prev(){
+  if(index > 0){
+    index--;
+    showSlide(index);
+  }
+}
+</script>
+
+</body>
+</html>
