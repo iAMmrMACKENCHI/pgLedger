@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Classroom to Career</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080a0f;
+    --gold: #c9a84c;
+    --gold-dim: rgba(201,168,76,0.15);
+    --gold-glow: rgba(201,168,76,0.35);
+    --teal: #1d9e8f;
+    --rust: #c05a3e;
+    --cream: #f2ede4;
+    --muted: rgba(242,237,228,0.35);
+    --dim: rgba(242,237,228,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--cream);
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLL TRACK ── */
+  .track {
+    position: relative;
+  }
+
+  /* ── STICKY PROGRESS LINE ── */
+  .scroll-line {
+    position: fixed;
+    left: 44px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(242,237,228,0.06);
+    z-index: 10;
+    pointer-events: none;
+  }
+  .scroll-line-fill {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--teal) 100%);
+    height: 0%;
+    transition: height 0.1s linear;
+    box-shadow: 0 0 8px var(--gold-glow);
+  }
+
+  /* ── SECTION BASE ── */
+  .section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 100px 80px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── LIT / UNLIT states ── */
+  .reveal-el {
+    opacity: 0.07;
+    transform: translateY(30px);
+    filter: blur(2px);
+    transition:
+      opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform, filter;
+  }
+  .reveal-el.lit {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  /* staggered children */
+  .reveal-el:nth-child(1) { transition-delay: 0s; }
+  .reveal-el:nth-child(2) { transition-delay: 0.1s; }
+  .reveal-el:nth-child(3) { transition-delay: 0.2s; }
+  .reveal-el:nth-child(4) { transition-delay: 0.3s; }
+  .reveal-el:nth-child(5) { transition-delay: 0.4s; }
+
+  /* ── AMBIENT GLOW per section ── */
+  .section::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    opacity: 0;
+  }
+  .section.lit::before { opacity: 1; }
+
+  /* ────────────────────────────────
+     SECTION 1 — HERO
+  ──────────────────────────────── */
+  #hero {
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 120px;
+  }
+  #hero::before {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    top: -100px; right: 0;
+  }
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 28px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px; height: 1px;
+    background: var(--gold);
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 7vw, 100px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    color: var(--cream);
+    margin-bottom: 36px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+  .hero-chips {
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .chip {
+    padding: 8px 18px;
+    border-radius: 40px;
+    border: 1px solid rgba(201,168,76,0.25);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+
+  .scroll-hint {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    z-index: 20;
+    transition: opacity 0.5s;
+  }
+  .scroll-hint.hidden { opacity: 0; pointer-events: none; }
+  .scroll-arrow {
+    width: 22px; height: 32px;
+    border: 1px solid rgba(242,237,228,0.2);
+    border-radius: 12px;
+    display: flex; justify-content: center; align-items: flex-start;
+    padding-top: 6px;
+  }
+  .scroll-arrow::before {
+    content: '';
+    width: 4px; height: 8px;
+    background: var(--gold);
+    border-radius: 2px;
+    animation: scrollDot 1.6s ease-in-out infinite;
+  }
+  @keyframes scrollDot {
+    0% { transform: translateY(0); opacity: 1; }
+    80% { transform: translateY(12px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+  }
+
+  /* ── SECTION LABEL (fixed left) ── */
+  .section-counter {
+    position: absolute;
+    left: 52px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(242,237,228,0.2);
+    white-space: nowrap;
+    transform-origin: left center;
+    transition: color 0.6s;
+  }
+  .section.lit .section-counter { color: var(--gold); }
+
+  /* ────────────────────────────────
+     SECTION 2 — PHASE 1
+  ──────────────────────────────── */
+  #phase1 {
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 120px;
+  }
+  #phase1::before {
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(29,158,143,0.07) 0%, transparent 65%);
+    bottom: -200px; right: -100px;
+  }
+
+  .phase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .phase-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 10px var(--teal);
+  }
+  .phase-label-text {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 54px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 48px;
+    color: var(--cream);
+  }
+  .section-heading span { color: var(--teal); }
+
+  .point-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 780px;
+  }
+
+  .pt {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 26px 26px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+  .pt:hover {
+    background: rgba(29,158,143,0.07);
+    border-color: rgba(29,158,143,0.3);
+    box-shadow: 0 0 30px rgba(29,158,143,0.1);
+  }
+  .pt-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+  .pt-body {
+    font-size: 14px;
+    color: rgba(242,237,228,0.8);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .pt-body strong {
+    color: var(--cream);
+    font-weight: 500;
+  }
+  .pt-glow {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0.04;
+    top: -20px; right: -20px;
+    filter: blur(20px);
+  }
+
+  /* ────────────────────────────────
+     SECTION 3 — PHASE 2 / STATS
+  ──────────────────────────────── */
+  #phase2 {
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 120px;
+  }
+  #phase2::before {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(192,90,62,0.1) 0%, transparent 65%);
+    top: -100px; left: 30%;
+  }
+  #phase2 .phase-dot { background: var(--rust); box-shadow: 0 0 10px var(--rust); }
+  #phase2 .phase-label-text { color: var(--rust); }
+  #phase2 .section-heading span { color: var(--rust); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    max-width: 900px;
+    margin-bottom: 28px;
+  }
+  .stat-block {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    padding: 28px 20px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .stat-block:hover {
+    border-color: rgba(192,90,62,0.35);
+    box-shadow: 0 0 36px rgba(192,90,62,0.1);
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(34px, 3.5vw, 50px);
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .stat-unit {
+    font-size: 0.45em;
+    color: rgba(201,168,76,0.5);
+    vertical-align: super;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+  }
+  .stat-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+  .stat-underline {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    background: var(--gold);
+    width: 0%;
+    transition: width 1.4s 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lit .stat-underline { width: 100%; }
+
+  .insight-bar {
+    max-width: 900px;
+    background: rgba(192,90,62,0.07);
+    border-left: 3px solid var(--rust);
+    border-radius: 0 12px 12px 0;
+    padding: 18px 24px;
+    font-size: 13px;
+    color: rgba(242,237,228,0.65);
+    line-height: 1.7;
+  }
+  .insight-bar strong { color: var(--rust); }
+
+  /* ────────────────────────────────
+     SECTION 4 — OUTCOME
+  ──────────────────────────────── */
+  #outcome {
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 120px;
+  }
+  #outcome::before {
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 65%);
+    top: -100px; right: -50px;
+  }
+  #outcome .phase-dot { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+  #outcome .phase-label-text { color: var(--gold); }
+  #outcome .section-heading span { color: var(--gold); }
+
+  .outcome-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 700px;
+    margin-bottom: 44px;
+  }
+  .oc {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 28px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s;
+    cursor: default;
+  }
+  .oc:hover {
+    background: rgba(201,168,76,0.06);
+    border-color: rgba(201,168,76,0.3);
+    transform: translateX(8px);
+  }
+  .oc-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    border-radius: 12px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .oc-text strong {
+    display: block;
+    font-size: 15px;
+    color: var(--cream);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .oc-text p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .final-line {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 2.5vw, 26px);
+    font-style: italic;
+    color: rgba(242,237,228,0.35);
+    max-width: 600px;
+    line-height: 1.5;
+  }
+  .final-line span { color: var(--gold); opacity: 1; }
+
+  /* ── FIXED NAV DOTS (right) ── */
+  .nav-dots {
+    position: fixed;
+    right: 36px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 50;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(242,237,228,0.15);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+  .nav-dot::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .nav-dot:hover::after { opacity: 1; }
+  .nav-dot.active {
+    background: var(--gold);
+    transform: scale(1.6);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Scroll line -->
+<div class="scroll-line">
+  <div class="scroll-line-fill" id="scrollFill"></div>
+</div>
+
+<!-- Scroll hint -->
+<div class="scroll-hint" id="scrollHint">
+  <div class="scroll-arrow"></div>
+  <span>Scroll</span>
+</div>
+
+<!-- Nav dots -->
+<div class="nav-dots" id="navDots">
+  <div class="nav-dot active" data-label="Intro" onclick="scrollTo('#hero')"></div>
+  <div class="nav-dot" data-label="Phase 1" onclick="scrollTo('#phase1')"></div>
+  <div class="nav-dot" data-label="Phase 2" onclick="scrollTo('#phase2')"></div>
+  <div class="nav-dot" data-label="Outcome" onclick="scrollTo('#outcome')"></div>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="section" id="hero">
+  <div class="section-counter">Introduction</div>
+  <div class="hero-eyebrow reveal-el">CBSE Senior Secondary Pathway</div>
+  <h1 class="hero-title reveal-el">
+    From<br>
+    <em>Classroom</em><br>
+    to Career.
+  </h1>
+  <p class="hero-sub reveal-el">
+    A structured journey through CBSE's senior secondary programme — building academic depth, closing India's skill gap, and charting a clear professional future.
+  </p>
+  <div class="hero-chips reveal-el">
+    <span class="chip">3 Phases</span>
+    <span class="chip">Career Roadmap</span>
+    <span class="chip">Skill Pathways</span>
+  </div>
+</section>
+
+<!-- ══════════ PHASE 1 ══════════ -->
+<section class="section" id="phase1">
+  <div class="section-counter">Phase 01</div>
+  <div class="phase-badge reveal-el">
+    <div class="phase-dot"></div>
+    <span class="phase-label-text">Phase 01 of 03</span>
+  </div>
+  <h2 class="section-heading reveal-el">Building the<br><span>Academic Foundation</span></h2>
+  <div class="point-row">
+    <div class="pt reveal-el">
+      <div class="pt-glow"></div>
+      <div class="pt-num">01 —</div>
+      <div class="pt-body">Physics as a stage of <strong>discipline-based transition</strong> — shifting from general awareness to rigorous scientific thinking.</div>
+    </div>
+    <div class="pt reveal-el">
+      <div class="pt-glow"></div>
+      <div class="pt-num">02 —</div>
+      <div class="pt-body"><strong>Shift from general to rigorous depth</strong> — engaging with physical laws, derivations and quantitative analysis.</div>
+    </div>
+    <div class="pt reveal-el">
+      <div class="pt-glow"></div>
+      <div class="pt-num">03 —</div>
+      <div class="pt-body"><strong>Integration of theory and practical application</strong> — lab experiments and real-world problems work in tandem.</div>
+    </div>
+    <div class="pt reveal-el">
+      <div class="pt-glow"></div>
+      <div class="pt-num">04 —</div>
+      <div class="pt-body">Sustained <strong>focus on conceptual competence</strong> — understanding the "why" behind each principle.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PHASE 2 ══════════ -->
+<section class="section" id="phase2">
+  <div class="section-counter">Phase 02</div>
+  <div class="phase-badge reveal-el">
+    <div class="phase-dot"></div>
+    <span class="phase-label-text">Phase 02 of 03</span>
+  </div>
+  <h2 class="section-heading reveal-el">Bridging the<br><span>Career Skill Gap</span></h2>
+  <div class="stats-row">
+    <div class="stat-block reveal-el">
+      <div class="stat-val">21.2<span class="stat-unit">%</span></div>
+      <div class="stat-desc">Skilled workforce<br>in India</div>
+      <div class="stat-underline"></div>
+    </div>
+    <div class="stat-block reveal-el">
+      <div class="stat-val">11.5<span class="stat-unit">%</span></div>
+      <div class="stat-desc">Technical &amp; vocational<br>workforce</div>
+      <div class="stat-underline"></div>
+    </div>
+    <div class="stat-block reveal-el">
+      <div class="stat-val">45.9<span class="stat-unit">%</span></div>
+      <div class="stat-desc">Employable youth<br>nationally</div>
+      <div class="stat-underline"></div>
+    </div>
+    <div class="stat-block reveal-el">
+      <div class="stat-val">40<span class="stat-unit">+</span></div>
+      <div class="stat-desc">Specialised skill<br>pathways available</div>
+      <div class="stat-underline"></div>
+    </div>
+  </div>
+  <div class="insight-bar reveal-el">
+    <strong>The opportunity:</strong> CBSE's skill elective programmes offer 40+ specialised pathways — from AI and healthcare to retail and automotive — designed to close this gap directly from school.
+  </div>
+</section>
+
+<!-- ══════════ OUTCOME ══════════ -->
+<section class="section" id="outcome">
+  <div class="section-counter">Outcome</div>
+  <div class="phase-badge reveal-el">
+    <div class="phase-dot"></div>
+    <span class="phase-label-text">Outcome</span>
+  </div>
+  <h2 class="section-heading reveal-el">Where the<br><span>Path Leads</span></h2>
+  <div class="outcome-list">
+    <div class="oc reveal-el">
+      <div class="oc-icon">🏗️</div>
+      <div class="oc-text">
+        <strong>Structured Professional Progression</strong>
+        <p>A deliberate sequence from foundational knowledge to career-level expertise and specialisation.</p>
+      </div>
+    </div>
+    <div class="oc reveal-el">
+      <div class="oc-icon">🗺️</div>
+      <div class="oc-text">
+        <strong>Clear Roadmap: Entry to Senior Roles</strong>
+        <p>From internships and apprenticeships to mid-career and leadership positions in chosen fields.</p>
+      </div>
+    </div>
+    <div class="oc reveal-el">
+      <div class="oc-icon">⚡</div>
+      <div class="oc-text">
+        <strong>Academic Learning Meets Industry Needs</strong>
+        <p>Bridging what students study with what employers require — no gap left unbridged.</p>
+      </div>
+    </div>
+  </div>
+  <p class="final-line reveal-el">
+    "Study for a <span>career</span>, not just an exam."
+  </p>
+</section>
+
+<script>
+  // ── INTERSECTION OBSERVER for reveal ──
+  const revealEls = document.querySelectorAll('.reveal-el');
+  const sections = document.querySelectorAll('.section');
+  const navDots = document.querySelectorAll('.nav-dot');
+  const scrollFill = document.getElementById('scrollFill');
+  const scrollHint = document.getElementById('scrollHint');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('lit');
+      } else {
+        // un-lit when scrolled away so it re-animates on revisit
+        entry.target.classList.remove('lit');
+      }
+    });
+  }, { threshold: 0.25 });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── SECTION observer for ambient glow + nav dots ──
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('lit');
+        // update nav dot
+        const idx = [...sections].indexOf(entry.target);
+        navDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      } else {
+        entry.target.classList.remove('lit');
+      }
+    });
+  }, { threshold: 0.5 });
+
+  sections.forEach(s => sectionObserver.observe(s));
+
+  // ── SCROLL PROGRESS LINE ──
+  window.addEventListener('scroll', () => {
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docH > 0 ? (window.scrollY / docH) * 100 : 0;
+    scrollFill.style.height = pct + '%';
+
+    // hide scroll hint after first scroll
+    if (window.scrollY > 80) scrollHint.classList.add('hidden');
+  }, { passive: true });
+
+  // ── NAV DOT CLICK ──
+  function scrollTo(id) {
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Kick off hero elements immediately
+  document.querySelectorAll('#hero .reveal-el').forEach((el, i) => {
+    setTimeout(() => el.classList.add('lit'), 200 + i * 120);
+  });
+</script>
+</body>
+</html>
